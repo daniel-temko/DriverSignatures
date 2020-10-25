@@ -4,10 +4,12 @@ Code to analyse the effects of mutation processes and selection on relative freq
 
 ## Usage
 
-DriverSpectrums.R reads in whole genome and whole exome sequencing data from TCGA and ICGC, and associated metadata.
+### Preprocessing
+DriverSpectrums.R reads WGS (whole genome sequencing) and WXS (whole exome sequencing) mutation data into R, and creates the associated R metadata.
 
 Preprocessing.R generates summary tables of mutation occurences and mutation signature scores per patient for use in downstream analysis steps.
 
+### Analysis
 DriverSignatureAssociations.R contains the code to analyse associations between driver mutation frequencies and mutational signatures across patients within each cancer type. 
 
 DriverSelectionInference.R contains the code to infer relative fitness effects of driver within cancer types.
