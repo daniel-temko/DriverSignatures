@@ -1,0 +1,4 @@
+chr,pos,ref,alt,consequence,hugo.gene,residue,name,fullMutation,context,gene.context,aa.context
+chr1,1000,C,T,nonsynonymous SNV,Gene.1,T23M,Gene.1 T23M,chr1 1000 C>T (ACG),C>T (ACG),Gene.1 C>T (ACG),Gene.1 T23M C>T (ACG)
+chr1,2000,C,T,nonsynonymous SNV,Gene.1,A241V,Gene.1 A241V,chr1 2000 C>T (GCG),C>T (GCG),Gene.1 C>T (GCG),Gene.1 A241V C>T (GCG)
+crh1,3000,C,A,nonsynonymous SNV,Gene.2,A56D,Gene.2 A56D,chr1 3000 C>A (GCC),C>A (GCC),Gene.2 C>A (GCC),Gene.2 A56D C>A (GCC)
