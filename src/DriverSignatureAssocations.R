@@ -53,7 +53,7 @@ hits$context.lfc <- log((hits$context.prop.in.sig + (1/96)) / (hits$context.prop
 hits <- hits[which(hits$context.lfc > 0),]
 
 # test significance
-load(file = paste('/Users/[user]/data/driver_spectrum/R_processed_data/', 'AARes.Rfile', sep = ''))
+load(file = paste(wrk_dir, 'R_processed_data/', 'AARes.Rfile', sep = ''))
 aa.res <- t(as.data.frame(lapply(1:nrow(hits), function(x) TestChangeWilcox(presence.table = mutation.aa.context.tab,
                                                                             signature.table = signature.scores.norm, 
                                                                             metadata = metadata, 
@@ -63,7 +63,7 @@ aa.res <- t(as.data.frame(lapply(1:nrow(hits), function(x) TestChangeWilcox(pres
                                                                             group.by = 'disease.group',
                                                                             alternate = 'greater'))))
 save(list = c('aa.res'),
-     file = paste('/Users/[user]/data/driver_spectrum/R_processed_data/', 'AARes.Rfile', sep = ''))
+     file = paste(wrk_dir, 'R_processed_data/', 'AARes.Rfile', sep = ''))
 hits <- cbind(hits, aa.res)
 colnames(hits)[((ncol(hits) - 1):ncol(hits))] <- c('effect.size', 'p.value')
 
@@ -79,7 +79,7 @@ for(i in n.base:20){
   fdr <- 0.05
   n.hits <- c(n.hits, length(which((aa.hits$q.value < fdr))))
 }
-pdf(file = paste('/Users/[user]/data/driver_spectrum/analysis/data_summary/Hits.pdf', sep = ''))
+pdf(file = paste(wrk_dirm 'analysis/data_summary/Hits.pdf', sep = ''))
 plot(n.vals, n.hits)
 dev.off()
 n <- 4
@@ -101,7 +101,7 @@ aa.hits$direction <- sapply(aa.hits$effect.size, function(x) if(x > 0){ 'pos'} e
 
 aa.sum <- aa.hits[,c('mutation', 'gene', 'signature', 'annotation', 'signature.type', 'signature.group', 'classification', 'value', 'mutation.frequency', 'context', 'effect.size', 'context.prop.in.sig', 'context.prop.in.disease', 'context.lfc', 'q.value', 'significant', 'direction')]
 save(list = c('aa.sum'),
-     file = paste('/Users/[user]/data/driver_spectrum/R_processed_data/', 'AASum.Rfile', sep = ''))
+     file = paste(wrk_dir, 'R_processed_data/', 'AASum.Rfile', sep = ''))
 
 
 aa.sig <- aa.sum[which(aa.sum$significant == 's'), ]
@@ -114,4 +114,4 @@ aa.write$mutation <- hits.all$short.name[match(aa.write$mutation, hits.all$aa.co
 colnames(aa.write)[match(c('signature.group', 'value', 'context', 'mutation.frequency'), colnames(aa.write))] <- c('disease', 'mutation.count', 'causal.channel', 'mutation.frequency.in.tumour.type')
 
 # write aa results lits
-write.table(aa.write, file = '/Users/[user]/data/driver_spectrum/analysis/data_summary/Driver_Signature_Associations.csv', sep = ',', row.names = F)
+write.table(aa.write, file = paste0(wrk_dir, 'analysis/data_summary/Driver_Signature_Associations.csv'), sep = ',', row.names = F)

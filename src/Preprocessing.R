@@ -98,12 +98,12 @@ TransformContext <- function(context){
 }
 
 # signature metadata - used for assigning signature scores and labelling signatures
-signature.annotations <- read.table(file = "/Users/[user]/data/ref/signature.annotations.csv", 
+signature.annotations <- read.table(file = "signature.annotations.csv", 
                                     sep = ',', col.names = c('process', 'association', 'type', 'clock.like'))
 signature.annotations$name <- paste(signature.annotations$process, signature.annotations$association)
 signature.annotations$unq.ann <- as.character(signature.annotations$association)
 signature.annotations$unq.ann[which(signature.annotations$unq.ann == 'Unknown aetiology')] <- signature.annotations$name[which(signature.annotations$unq.ann == 'Unknown aetiology')]
-signatures.tissue.map <- read.table(file = "/Users/[user]/data/ref/diseases.and.signatures.csv", 
+signatures.tissue.map <- read.table(file = "diseases.and.signatures.csv", 
                                     sep = ',', header = T)
 signature.tissue.df <- melt(signatures.tissue.map, id.var = 'signature.group')
 signature.tissue.df <- signature.tissue.df[-which(is.na(signature.tissue.df$value)), ]
@@ -114,7 +114,7 @@ min.signature.mutations <- 20
 freq.threshold <- 0.01
 n.base <- 10
 
-load(file = paste('/Users/[user]/data/driver_spectrum/R_data/signatures.summary.data.Rfile', sep = ''))
+load(file = paste(wrk_dir, 'R_data/signatures.summary.data.Rfile', sep = ''))
 
 ####################################################################################################################################
 
@@ -202,4 +202,4 @@ save(list = c('metadata.full', 'mutation.aa.change.tab', 'mutation.aa.context.ta
               'signature.context.tab', 'signature.context.norm', 'contexts.imputed', 'signature.tissue.df',
               'hits.all', 'metadata', 'selection.genes', 'gene.sets', 'set.diseases', 'processes',
               'prc.proven', 'prc.proven.even', 'prc.proven.exome', 'freq.threshold'),
-     file = paste('/Users/[user]/data/driver_spectrum/R_data/signatures.summary.data.Rfile', sep = ''))
+     file = paste(wrk_dir, 'R_data/signatures.summary.data.Rfile', sep = ''))

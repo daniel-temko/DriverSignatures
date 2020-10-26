@@ -147,7 +147,7 @@ selection.sum$significant <- sapply(selection.sum$q.value, function(x) if(!is.na
 selection.sum$gene1 <- hits.all$hugo.gene[match(selection.sum$mutation1, hits.all$aa.context)]
 selection.sum$gene2 <- hits.all$hugo.gene[match(selection.sum$mutation2, hits.all$aa.context)]
 save(list = c('selection.sum'),
-     file = paste('/Users/[user]/data/driver_spectrum/R_processed_data/', 'SelectionSum.Rfile', sep = ''))
+     file = paste(wrk_dir, 'R_processed_data/', 'SelectionSum.Rfile', sep = ''))
 
 selection.write <- selection.sum
 selection.write$mutation1 <- sapply(1:nrow(selection.sum), function(x) if(selection.sum$direction[x] == 'above') {selection.sum$mutation1[x]} else {selection.sum$mutation2[x]})
@@ -161,9 +161,9 @@ selection.sig <- selection.write[which(selection.write$significant == 's'),]
 gene.sig <- selection.sig[which(!(selection.sig$set %in% gene.sets$id)), c('set', 'mutation1', 'mutation2', 'disease', 'q.value')]
 set.sig <- selection.sig[which(selection.sig$set %in% gene.sets$id), c('set', 'mutation1', 'gene1', 'mutation2', 'gene2', 'disease', 'q.value')]
 
-write.table(gene.sig, file = '/Users/[user]/data/driver_spectrum/analysis/data_summary/Selection_Inference_Genes.csv',
+write.table(gene.sig, file = paste0(wrk_dir, 'analysis/data_summary/Selection_Inference_Genes.csv'),
             sep = ',', row.names = F)
-write.table(set.sig, file = '/Users/[user]/data/driver_spectrum/analysis/data_summary/Selection_Inference_Gene_Sets.csv',
+write.table(set.sig, file = paste0(wrk_dir, 'analysis/data_summary/Selection_Inference_Gene_Sets.csv'),
             sep = ',', row.names = F)
 
 ####################################################################################
@@ -209,13 +209,13 @@ pairwise.selection$gene1 <- hits.all$hugo.gene[match(pairwise.selection$mutation
 pairwise.selection$gene2 <- hits.all$hugo.gene[match(pairwise.selection$mutation2, hits.all$aa.context)]
 
 save(list = c('pairwise.selection'),
-     file = paste('/Users/[user]/data/driver_spectrum/R_processed_data/', 'PairwiseSelection.Rfile', sep = ''))
+     file = paste(wrk_dir, 'R_processed_data/', 'PairwiseSelection.Rfile', sep = ''))
 
 
 ####################################################################################
 
 # unitary analysis
-load(file = paste('/Users/[user]/data/driver_spectrum/R_processed_data/', 'UnitarySelection.Rfile', sep = ''))
+load(file = paste(wrk_dir, 'R_processed_data/', 'UnitarySelection.Rfile', sep = ''))
 unitary.selection <- c()
 for(gene in selection.genes){
   print(gene)
@@ -240,7 +240,7 @@ for(gene in selection.genes){
   }
 }
 save(list = c('unitary.selection'),
-     file = paste('/Users/[user]/data/driver_spectrum/R_processed_data/', 'UnitarySelection.Rfile', sep = ''))
+     file = paste(wrk_dir, 'R_processed_data/', 'UnitarySelection.Rfile', sep = ''))
 
 ################################################################################################################################
 # variation explained

@@ -24,8 +24,13 @@ library(org.Hs.eg.db)
 require('SomaticSignatures')
 # load mutation data
 
+### Set Paths ####
+wrk_dir <- ""
+data_dir <- ""
+### Set Paths ####
+
 # read in oncogenes and assign ensemble gene.id column
-setwd("/Users/[user]/data/ref/")
+setwd(data_dir)
 genes <- read.table('Vogelstein.Cancer.Genome.Landscapes.Table.S2a.edit.2.Aug.2017.csv', sep = ',', header = T, stringsAsFactors = F)
 map <- read.table('ensembl.id.to.hgnc.symbol.txt', sep = '\t', header = T, stringsAsFactors = F)
 genes$name <- genes$gene_name
@@ -42,28 +47,28 @@ ogs <- genes[which(genes$classification == 'Oncogene'), ]
 eg.map <- as.list(org.Hs.egSYMBOL2EG)
 genes$entrez.id <- as.character(eg.map[genes$gene_name])
 
-canonical <- read.table('/Users/[user]/data/ref/knownCanonical.5.June.2017.txt', col.names = c('chr', 'start', 'end', 'row', 'transcript.id', 'Ensembl.Gene.ID.full'))
+canonical <- read.table(paste0(ref_dir, '/knownCanonical.5.June.2017.txt'), col.names = c('chr', 'start', 'end', 'row', 'transcript.id', 'Ensembl.Gene.ID.full'))
 canonical$Ensembl.Gene.ID <- sapply(canonical$Ensembl.Gene.ID.full, function(x) strsplit(as.character(x), '\\.')[[1]][1])
 genes$transcript.id <- canonical$transcript.id[match(genes$ensembl.id, canonical$Ensembl.Gene.ID)]
-cross.ref <- read.table('/Users/[user]/data/ref/knownToRefSeq.6.June.tsv', col.names = c('transcript.id', 'transcript'))
+cross.ref <- read.table(paste0(ref_dir, 'knownToRefSeq.6.June.tsv'), col.names = c('transcript.id', 'transcript'))
 genes$transcript <- cross.ref$transcript[match(genes$transcript.id, cross.ref$transcript.id)]
 genes <- genes[which(!(genes$name == 'U2AF1')),]
 
 # read in metadata
-msl <- read.table("/Users/[user]/data/driver_spectrum/metadata/MasterSampleList.csv", sep = ',', header = T, stringsAsFactors = F)
-cancer.groupings <- read.table("/Users/[user]/data/driver_spectrum/metadata/Disease.Classification.csv", sep = ',', header = T, stringsAsFactors = F)
+msl <- read.table(paste0(wrk_dir, "metadata/MasterSampleList.csv"), sep = ',', header = T, stringsAsFactors = F)
+cancer.groupings <- read.table(paste0(wrk_dir, "metadata/Disease.Classification.csv"), sep = ',', header = T, stringsAsFactors = F)
 cancer.groupings$disease.group <- sapply(1:nrow(cancer.groupings), function(x) if(!is.na(cancer.groupings$Signature.Group[x])) {cancer.groupings$Signature.Group[x]} else {cancer.groupings$Disease[x]})
-tcga.samples <- read.table("/Users/[user]/data/driver_spectrum/metadata/TCGA.Files.csv", sep = ',', header = T, stringsAsFactors = F)
+tcga.samples <- read.table(paste0(wrk_dir, "metadata/TCGA.Files.csv"), sep = ',', header = T, stringsAsFactors = F)
 tcga.samples$Data.ID <- sapply(tcga.samples$Paths, function(x) strsplit(x, '/')[[1]][1])
 # read in data
 short.names <- msl$Study.ID
 
 # read in Alexandrov singatures and normalise to exome
-prc <- read.table('/Users/[user]/data/ref/signatures_probabilities.txt', sep = '\t', header = T, stringsAsFactors = F)
+prc <- read.table('signatures_probabilities.txt', sep = '\t', header = T, stringsAsFactors = F)
 unordered.processes <- paste(gsub('>', '', prc$Substitution.Type), paste(substr(prc$Trinucleotide, 1, 1), substr(prc$Trinucleotide, 3, 3), sep = '.'))
 prc <- prc[order(unordered.processes), ]
 processes <- sort(unordered.processes)
-tnf <- read.table("/Users/[user]/data/ref/trinucleotide.frequencies.tsv", header = T, stringsAsFactors = F)
+tnf <- read.table("trinucleotide.frequencies.tsv", header = T, stringsAsFactors = F)
 cnf <- data.frame(process = processes, type = as.character(sapply(processes, function(x) paste(substr(x,4,4), substr(x,1,1), substr(x,6,6), sep = ''))))
 cnf$genome <- tnf$genome[match(cnf$type, tnf$type)]
 cnf$exome <- tnf$exome[match(cnf$type, tnf$type)]
@@ -96,7 +101,7 @@ for (short.name in sub){
   if (msl$ICGC.portal[match(short.name, msl$Study.ID)] == 'no'){
     next
   }
-  file <- paste("/Users/[user]/apocrita/data_mount_point_2/daniel_import/signatures/ICGC/ssm.", msl$ICGC.Study.Abbr[match(short.name, msl$Study.ID)], ".tsv", sep = '')
+  file <- paste(wrk_dir, "ICGC/ssm.", msl$ICGC.Study.Abbr[match(short.name, msl$Study.ID)], ".tsv", sep = '')
   
   print(paste('Parsing', file))
   # read in data
@@ -132,12 +137,12 @@ for (short.name in sub){
   vr <- VRanges(seqnames = Rle(paste('chr',data$chromosome, sep = '')), ranges = IRanges(start = data$chromosome_start, end = data$chromosome_end), 
                 ref = as.character(data$mutated_from_allele), alt = as.character(data$mutated_to_allele), sampleNames = as.character(data$icgc_donor_id),
                 submitted_sample_id = data$submitted_sample_id, strategy = data$sequencing_strategy)
-  file = "/Users/[user]/data/ref/ucsc.hg19.fasta"
+  file = "ucsc.hg19.fasta"
   fa <- open(FaFile(file, sprintf("%s.fai", file)))
 
   # check alignment genome is hg19
   vr.ref = DNAStringSet(ref(vr))
-  file = "/Users/[user]/data/ref/ucsc.hg19.fasta"
+  file = "ucsc.hg19.fasta"
   fa <- open(FaFile(file, sprintf("%s.fai", file)))
   gr <- granges(vr)
   genome.ref = getSeq(fa, gr)
@@ -155,7 +160,7 @@ for (short.name in sub){
   assign(paste(gsub('-', '_', short.name), '.ICGC.vr', sep = ''), vr)
   assign(paste(gsub('-', '_', short.name), '.ICGC.annotation', sep = ''), annotation)
   save(list = c(paste(gsub("-", "_", short.name), '.ICGC.vr', sep = ''), paste(gsub('-', '_', short.name), '.ICGC.annotation', sep = '')),
-       file = paste('/Users/[user]/data/driver_spectrum/R_data/', short.name, '.ICGC.Rfile', sep = ''))
+       file = paste(wkr_dir, 'R_data/', short.name, '.ICGC.Rfile', sep = ''))
   rm(list = c(paste(gsub("-", "_", short.name), '.ICGC.vr', sep = ''), paste(gsub('-', '_', short.name), '.ICGC.annotation', sep = '')))
 }
 
@@ -176,7 +181,7 @@ for (short.name in short.names){
   vr <- VRanges()
   annotation <- c()
   for (i in 1:length(paths)){
-    file <- paste("/Users/[user]/apocrita/data_mount_point_2/daniel_import/signatures/TCGA/", paths[i], sep = '')
+    file <- paste(wrk_dir, "signatures/TCGA/", paths[i], sep = '')
     
     if(class(try(read.table(file = file, sep = '\t',header = T, quote = '', stringsAsFactors = F), silent = T)) == 'try-error'){
       error.files <- c(error.files, file)
@@ -247,7 +252,7 @@ for (short.name in short.names){
     
     # check alignment genome is hg19
     vr.tmp.ref = DNAStringSet(ref(vr.tmp))
-    file = "/Users/[user]/data/ref/ucsc.hg19.fasta"
+    file = "ucsc.hg19.fasta"
     fa <- open(FaFile(file, sprintf("%s.fai", file)))
     gr <- granges(vr.tmp)
     genome.ref = getSeq(fa, gr)
@@ -266,7 +271,7 @@ for (short.name in short.names){
   # remove duplicates from the vr and annotation file
   
   # annotate contexts
-  file = "/Users/[user]/data/ref/ucsc.hg19.fasta"
+  file = "ucsc.hg19.fasta"
   fa <- open(FaFile(file, sprintf("%s.fai", file)))
   vr <- mutationContext(vr = vr, ref = fa)
   vr$signature = as.factor(paste(vr$alteration, vr$context))
@@ -275,7 +280,7 @@ for (short.name in short.names){
   assign(paste(gsub('-', '_', short.name), '.TCGA.vr', sep = ''), vr)
   assign(paste(gsub('-', '_', short.name), '.TCGA.annotation', sep = ''), annotation)
   save(list = c(paste(gsub("-", "_", short.name), '.TCGA.vr', sep = ''), paste(gsub('-', '_', short.name), '.TCGA.annotation', sep = '')),
-       file = paste('/Users/[user]/data/driver_spectrum/R_data/', short.name, '.TCGA.Rfile', sep = ''))
+       file = paste(wrk_dir, 'R_data/', short.name, '.TCGA.Rfile', sep = ''))
   rm(list = c(paste(gsub("-", "_", short.name), '.TCGA.vr', sep = ''), paste(gsub('-', '_', short.name), '.TCGA.annotation', sep = '')))
 }
 
@@ -283,9 +288,9 @@ for (short.name in short.names){
 # merge the data sources and add amino acids to annotation
 for (short.name in short.names){
   print(paste('Mergeing ', short.name, '...', sep = ''))
-  icgc.file <- paste('/Users/[user]/data/driver_spectrum/R_data/', short.name, '.ICGC.Rfile', sep = '')
-  tcga.file <- paste('/Users/[user]/data/driver_spectrum/R_data/', short.name, '.TCGA.Rfile', sep = '')
-  merged.file <- paste('/Users/[user]/data/driver_spectrum/R_data/', short.name, '.merged.Rfile', sep = '')
+  icgc.file <- paste(wrk_dir, 'R_data/', short.name, '.ICGC.Rfile', sep = '')
+  tcga.file <- paste(wrk_dir, 'R_data/', short.name, '.TCGA.Rfile', sep = '')
+  merged.file <- paste(wrk_dir, 'R_data/', short.name, '.merged.Rfile', sep = '')
   if (file.exists(icgc.file) & !file.exists(tcga.file)){
     load(file = icgc.file)
     icgc.annotation <- get(paste(gsub('-', '_', short.name), '.ICGC.annotation', sep = ''))
@@ -343,7 +348,7 @@ for (short.name in short.names){
   merged.annotation <- merged.annotation[match(unique(merged.annotation$mutation), merged.annotation$mutation), ]
   # annotate A.A. changes 
   txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
-  file = "/Users/[user]/data/ref/ucsc.hg19.fasta"
+  file = "ucsc.hg19.fasta"
   fa <- open(FaFile(file, sprintf("%s.fai", file)))
   merged.annotation.vr <- VRanges(seqnames = Rle(paste('chr', merged.annotation$chromosome, sep = '')), 
                                 ranges = IRanges(start = merged.annotation$pos, end = merged.annotation$pos), 
@@ -370,7 +375,7 @@ for (short.name in short.names){
 # create inputs for annovar
 hits.all <- data.frame()
 for (short.name in short.names){
-  file = paste('/Users/[user]/data/driver_spectrum/R_data/', short.name, '.merged.Rfile', sep = '')
+  file = paste(wrk_dir, 'R_data/', short.name, '.merged.Rfile', sep = '')
   if (!file.exists(file)){
     next
   }
@@ -384,10 +389,10 @@ for (short.name in short.names){
 hits.all <- hits.all[match(unique(hits.all$fullMutation), hits.all$fullMutation),]
 # write annovar input
 annovar.input <- data.frame(CHROM = hits.all$chromosome, POS = hits.all$pos, POS = hits.all$pos, ref = hits.all$ref, alt = hits.all$alt, fullMutation = hits.all$fullMutation)
-write.table(annovar.input, file = '/Users/[user]/data/driver_spectrum/driver_mutations/annovar.csv', quote = F, row.names = F, sep = '\t')
+write.table(annovar.input, file = paste0(wrk_dir, 'driver_mutations/annovar.csv'), quote = F, row.names = F, sep = '\t')
 
 # read in the annotated file and update hits.all
-df <- read.table(file = '/Users/[user]/data/driver_spectrum/driver_mutations/annovar.csv.exonic_variant_function', sep = '\t')
+df <- read.table(file = paste0(wrk_dir, 'driver_mutations/annovar.csv.exonic_variant_function'), sep = '\t')
 hits.all <- data.frame(chromosome = df[,4], pos = df[,5], ref = df[,7], alt = df[,8], consequence = df[,2], fullMutation = df[,9], annovar = df[,3])
 hits.all$annovar <- as.character(hits.all$annovar)
 hits.all$transcripts <- sapply(1:nrow(hits.all), function(x) ParseAnnovarTranscript(string = hits.all$annovar[x]))
@@ -412,7 +417,7 @@ hits.all$context.name <- sapply(1:nrow(hits.all), function(x) paste(sapply(strsp
 hits.all$short.name <- paste(hits.all$name, ' (', hits.all$context.name, ')', sep = '')
 
 save(list = c('hits.all'),
-     file = paste('/Users/[user]/data/driver_spectrum/R_data/', 'Hits.Rfile', sep = ''))
+     file = paste(wrk_dir, 'R_data/', 'Hits.Rfile', sep = ''))
 
 ####################################################################################################################################
 
@@ -422,11 +427,11 @@ patient.metadata <- data.frame()
 presence.table <- c()
 for (short.name in short.names){
   print(paste('Calculating', short.name))
-  file = paste('/Users/[user]/data/driver_spectrum/R_data/', short.name, '.merged.Rfile', sep = '')
+  file = paste(wrk_dir, 'R_data/', short.name, '.merged.Rfile', sep = '')
   if (!file.exists(file)){
     next
   }
-  load(file = paste('/Users/[user]/data/driver_spectrum/R_data/', short.name, '.merged.Rfile', sep = ''))
+  load(file = paste(wrk_dir, 'R_data/', short.name, '.merged.Rfile', sep = ''))
   vr <- get(paste(gsub('-', '_', short.name), '.merged.vr', sep = ''))
   sampleNames(vr) <- factor(sampleNames(vr), levels = unique(sampleNames(vr)))
   # create signature.table.tmp
@@ -457,7 +462,7 @@ for (short.name in short.names){
 presence.table <- as.data.frame(presence.table)
 patient.metadata$disease.group <- cancer.groupings$disease.group[match(patient.metadata$disease, cancer.groupings$Disease)]
 save(list = c('signature.table.all', 'presence.table', 'patient.metadata'),
-     file = paste('/Users/[user]/data/driver_spectrum/R_data/', 'ByPatientSummaries.Rfile', sep = ''))
+     file = paste(wrk_dir, 'R_data/', 'ByPatientSummaries.Rfile', sep = ''))
 
 ####################################################################################################################################
 
@@ -481,4 +486,4 @@ patient.metadata$signature.mutations <- colSums(signature.table)
 mutations.and.patients <- tmp
 
 save(list = c('patient.metadata', 'signature.table', 'mutations.and.patients', 'gene.context.presence.table', 'gene.presence.table', 'aa.presence.table', 'aa.context.presence.table'),
-     file = paste('/Users/[user]/data/driver_spectrum/R_data/', 'Presence.Rfile', sep = ''))
+     file = paste(wrk_dir, 'R_data/', 'Presence.Rfile', sep = ''))
