@@ -20,9 +20,9 @@ _singature.probabilities.txt_: Table containing the proportion of each of the 96
 
 _MasterSampleList.csv_: Table containing metadata for the different mutation datasets to be analyzed - this needs to be tailored to the specific datasets being studied (see _data_ for example)
 
-_TCGA.Files.csv_: Table contatining file paths for TCGA mutation data
-
 _Disease.Classifications.csv_: Table mapping cancer types to cancer groups with COSMIC mutational signature annotations
+
+_TCGA.Files.csv_: Table containing file paths for TCGA mutation data
 
 ### Preprocessing
 DriverSpectrums.R loads mutation data into R, along with its associated metadata.
