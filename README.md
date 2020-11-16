@@ -1,6 +1,6 @@
 # DriverSignatures
 
-Code to analyse the effects of mutation processes and selection on relative frequencies of cancer driver mutations,
+Code to analyse the effects of mutation processes and selection on relative frequencies of cancer driver mutations.
 
 ## Usage
 
