@@ -1,0 +1,3 @@
+Study.ID,ICGC.portal,ICGC.Study.Abbr,TCGA.portal,TCGA.Study.Abbr,Disease,Disease.Abbr
+Study.1,yes,LUAD-US,no,NA,Lung Adenocarcinoma,LUAD
+Study.2,no,NA,yes,TCGA-PAAD,Pancreatic Adenocarcinoma,PAAD
