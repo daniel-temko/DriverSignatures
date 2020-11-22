@@ -1,0 +1,3 @@
+process,association,type,clock.like
+signature.1,Spontaneous deamination of 5.methylcytosine,endogenous,TRUE
+signature.2,APOBEC,endogenous,FALSE
