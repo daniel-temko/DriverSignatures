@@ -19,7 +19,7 @@ In addition to cancer mutation data, the preprocessing scripts require mutation 
 - _Disease.Classifications.csv_: Table mapping cancer types to cancer groups with COSMIC mutational signature annotations
 - _TCGA.Files.csv_: Table containing file paths for TCGA mutation data
 
-In addition, please note line 396 of DriverSpectrums.R uses the results of running ANNOVAR (1) on the output from line 393 
+In addition, please note line 396 of DriverSpectrums.R uses the results of running ANNOVAR (1) on the output from line 392 
 
 ### Preprocessing
 DriverSpectrums.R loads mutation data into R, along with its associated metadata.
