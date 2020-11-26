@@ -19,6 +19,7 @@ In addition to cancer mutation data, the preprocessing scripts require mutation 
 - _Disease.Classifications.csv_: Table mapping cancer types to cancer groups with COSMIC mutational signature annotations
 - _TCGA.Files.csv_: Table containing file paths for TCGA mutation data
 
+Line 396 of DriverSpectrums.R uses the results of running ANNOVAR (1) on the output from line 393 
 
 ### Preprocessing
 DriverSpectrums.R loads mutation data into R, along with its associated metadata.
@@ -29,3 +30,7 @@ Preprocessing.R generates summary tables of mutation occurences and mutation sig
 DriverSignatureAssociations.R contains the code to analyse associations between driver mutation frequencies and mutational signatures across patients within each cancer type. 
 
 DriverSelectionInference.R contains the code to infer relative fitness effects of driver within cancer types.
+
+### References
+
+1. Wang K, Li M, Hakonarson H. ANNOVAR: Functional annotation of genetic variants from next-generation sequencing data Nucleic Acids Research, 38:e164, 2010

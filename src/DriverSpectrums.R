@@ -391,6 +391,8 @@ hits.all <- hits.all[match(unique(hits.all$fullMutation), hits.all$fullMutation)
 annovar.input <- data.frame(CHROM = hits.all$chromosome, POS = hits.all$pos, POS = hits.all$pos, ref = hits.all$ref, alt = hits.all$alt, fullMutation = hits.all$fullMutation)
 write.table(annovar.input, file = paste0(wrk_dir, 'driver_mutations/annovar.csv'), quote = F, row.names = F, sep = '\t')
 
+## Run Annovar on annovar.csv to obtain annovar.csv.exonic_variant_function ##
+
 # read in the annotated file and update hits.all
 df <- read.table(file = paste0(wrk_dir, 'driver_mutations/annovar.csv.exonic_variant_function'), sep = '\t')
 hits.all <- data.frame(chromosome = df[,4], pos = df[,5], ref = df[,7], alt = df[,8], consequence = df[,2], fullMutation = df[,9], annovar = df[,3])
